@@ -1,8 +1,10 @@
+import sys
+import time
+import asyncio
 import speedtest
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-import asyncio
+
 iteration = -1
 
 
@@ -24,18 +26,18 @@ async def speedTest():
     return iteration, latency, down, up
 
 
-def main(iterations):
-    data = np.zeros((iterations, 3))
+def main(iters):
+    data = np.zeros((iters, 3))
     start = time.time()
     start_time = " ".join(time.asctime().split(" ")[1:4])
-    for i in range(iterations):
+    for i in range(iters):
         data = asyncio.run(results(data))
     end_time = " ".join(time.asctime().split(" ")[1:4])
     time_taken = time.time() - start
     np.savetxt("results.dat", data,
                header=f"Time taken = {time_taken/60} min\n,avg latency = {np.average(data[:,0])}, avg download = {np.average(data[:,1])}, "
                       f"avg upload = {np.average(data[:,2])}",
-               footer=f"{start_time} - {end_time} , {iterations} iterations")
+               footer=f"{start_time} - {end_time} , {iters} iterations")
     while True:
         plot = input("Plot? (y/n):\n").lower()
         if plot == "y":
@@ -58,10 +60,20 @@ def main(iterations):
 
 
 if __name__ == '__main__':
-    iterations = input("Iterations = ")
+    opts_list = [opt for opt in sys.argv[1:] if opt.startswith("-")]
+    args_list = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    help_tag = [opt for opt in opts_list if opt in ["-h, -help, -man, --h, --help"]]
+
+    if len(help_tag) != 0:
+        raise SystemExit(f"Usage: {sys.argv[0]} -i #ofIterations\n")
+    elif "-i" in opts_list:
+        iterations = args_list[opts_list.index("-i")]
+    else:
+        iterations = 100
+
     try:
         iterations = int(iterations)
-    except TypeError:
+    except ValueError:
         iterations = 100
+        print("Invalid value of iterations, defaulted to 100...")
     main(iterations)
-
