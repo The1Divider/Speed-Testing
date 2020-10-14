@@ -13,6 +13,7 @@ async def results(array):
     iteration_number = result[0]
     for i in range(3):
         array[iteration_number, i] = result[i + 1]
+    print(f"Down = {array[iteration_number, 1]} mbps, Latency = {array[iteration_number, 2]} ms")
     return array
 
 
