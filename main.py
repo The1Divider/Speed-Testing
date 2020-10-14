@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 iteration = -1
+plot = False
 
 
 async def results(array):
@@ -27,7 +28,7 @@ async def speedTest():
     return iteration, latency, down, up
 
 
-def main(iters):
+def main(iters, plot):
     data = np.zeros((iters, 3))
     start = time.time()
     start_time = " ".join(time.asctime().split(" ")[1:4])
@@ -39,25 +40,19 @@ def main(iters):
                header=f"Time taken = {time_taken/60} min\n,avg latency = {np.average(data[:,0])}, avg download = {np.average(data[:,1])}, "
                       f"avg upload = {np.average(data[:,2])}",
                footer=f"{start_time} - {end_time} , {iters} iterations")
-    while True:
-        plot = input("Plot? (y/n):\n").lower()
-        if plot == "y":
-            x = np.arange(iterations)
-            plt.plot(x, data[:, 1], label="Download Speed")
-            plt.plot(x, data[:, 2], label="Upload Speed")
-            plt.xlabel("Iteration")
-            plt.ylabel("Speed (mbps)")
-            plt.legend()
-            plt.show()
-            plt.plot(x, data[:, 0], label="Latency")
-            plt.xlabel("Iteration")
-            plt.ylabel("Latency (ms)")
-            plt.show()
-            break
-        elif plot == "n":
-            break
-        else:
-            print("Invalid input")
+
+    if plot:
+        x = np.arange(iterations)
+        plt.plot(x, data[:, 1], label="Download Speed")
+        plt.plot(x, data[:, 2], label="Upload Speed")
+        plt.xlabel("Iteration")
+        plt.ylabel("Speed (mbps)")
+        plt.legend()
+        plt.show()
+        plt.plot(x, data[:, 0], label="Latency")
+        plt.xlabel("Iteration")
+        plt.ylabel("Latency (ms)")
+        plt.show()
 
 
 if __name__ == '__main__':
@@ -71,10 +66,12 @@ if __name__ == '__main__':
         iterations = args_list[opts_list.index("-i")]
     else:
         iterations = 100
+    if "-p" in opts_list:
+        plot = True
 
     try:
         iterations = int(iterations)
     except ValueError:
         iterations = 100
         print("Invalid value of iterations, defaulted to 100...")
-    main(iterations)
+    main(iterations, plot)
