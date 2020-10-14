@@ -5,4 +5,5 @@
 Tag | Usage
 ----|------
 -i | Number of iterations
+-p | Plot results
 -h | Show help
